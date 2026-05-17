@@ -1,0 +1,167 @@
+﻿{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-search"></i> Buscar Carros</h3>
+            </div>
+            <div class="card-body">
+                <form id="form-busca">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">🏭 Marca *</label>
+                            <input type="text" class="form-control" id="marca" 
+                                   placeholder="Ex: Honda" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">🚙 Modelo</label>
+                            <input type="text" class="form-control" id="modelo" 
+                                   placeholder="Ex: Civic">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">💰 Preço Mínimo</label>
+                            <input type="number" class="form-control" id="preco_min" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">💰 Preço Máximo</label>
+                            <input type="number" class="form-control" id="preco_max" value="100000">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">🌐 Sites para Buscar</label>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="webmotors" checked>
+                                    <label class="form-check-label">WebMotors</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="mercado_livre" checked>
+                                    <label class="form-check-label">Mercado Livre</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="olx" checked>
+                                    <label class="form-check-label">OLX</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100" id="btn-buscar">
+                        <i class="fas fa-search"></i> <span id="btn-texto">Iniciar Busca</span>
+                        <span id="btn-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                </form>
+
+                <div id="status-busca" class="mt-3 d-none">
+                    <div class="alert alert-info">
+                        <i class="fas fa-spinner fa-spin"></i> 
+                        Buscando... <span id="total-encontrado">0</span> anúncios encontrados
+                    </div>
+                </div>
+
+                <div id="resultado-busca" class="mt-3 d-none">
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Busca Concluída!</h5>
+                        <a id="link-resultados" href="#" class="btn btn-success">
+                            Ver Resultados <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('form-busca').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btnBuscar = document.getElementById('btn-buscar');
+    const btnTexto = document.getElementById('btn-texto');
+    const btnSpinner = document.getElementById('btn-spinner');
+    
+    btnBuscar.disabled = true;
+    btnTexto.textContent = 'Buscando...';
+    btnSpinner.classList.remove('d-none');
+    
+    document.getElementById('status-busca').classList.remove('d-none');
+    document.getElementById('resultado-busca').classList.add('d-none');
+    
+    const sites = [];
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+        sites.push(cb.value);
+    });
+    
+    const dados = {
+        marca: document.getElementById('marca').value,
+        modelo: document.getElementById('modelo').value,
+        preco_min: parseFloat(document.getElementById('preco_min').value) || 0,
+        preco_max: parseFloat(document.getElementById('preco_max').value) || 999999,
+        ano_min: 2010,
+        ano_max: 2024,
+        sites: sites
+    };
+    
+    try {
+        const response = await fetch('/buscar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            monitorarBusca(result.busca_id);
+        }
+    } catch (error) {
+        alert('Erro ao buscar!');
+        resetarBotao();
+    }
+});
+
+async function monitorarBusca(buscaId) {
+    const intervalo = setInterval(async () => {
+        try {
+            const response = await fetch(/status/);
+            const status = await response.json();
+            
+            document.getElementById('total-encontrado').textContent = status.total;
+            
+            if (status.status === 'concluido') {
+                clearInterval(intervalo);
+                document.getElementById('status-busca').classList.add('d-none');
+                document.getElementById('resultado-busca').classList.remove('d-none');
+                document.getElementById('link-resultados').href = /resultados/;
+                resetarBotao();
+            }
+        } catch (error) {
+            clearInterval(intervalo);
+        }
+    }, 1000);
+}
+
+function resetarBotao() {
+    const btnBuscar = document.getElementById('btn-buscar');
+    const btnTexto = document.getElementById('btn-texto');
+    const btnSpinner = document.getElementById('btn-spinner');
+    
+    btnBuscar.disabled = false;
+    btnTexto.textContent = 'Iniciar Busca';
+    btnSpinner.classList.add('d-none');
+}
+</script>
+{% endblock %}
