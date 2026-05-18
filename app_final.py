@@ -10,213 +10,142 @@ app = Flask(__name__)
 scraper = cloudscraper.create_scraper()
 
 MARCAS_CLASSICAS = {
-    "Ford": ["Corcel", "Belina", "Del Rey", "Maverick", "Galaxie", "Landau", "F-1000", "Pampa", "Escort", "Verona", "Ka", "Fiesta"],
-    "Chevrolet": ["Opala", "Chevette", "Monza", "Caravan", "Kadett", "Ipanema", "Diplomata", "Comodoro", "Brasilia", "C10", "D20", "S10", "Blazer"],
-    "Volkswagen": ["Fusca", "Kombi", "Brasília", "SP2", "Gol", "Passat", "Santana", "Quantum", "Voyage", "Parati", "Saveiro", "Apollo"],
-    "Fiat": ["Uno", "Mille", "Elba", "Premio", "Oggi", "Panorama", "Tempra", "Tipo", "Bravo", "Marea", "Ducato"],
-    "Chrysler": ["Dart", "Charger", "Polara", "Magnum", "LeBaron", "Caravan", "Town & Country"],
-    "Dodge": ["Dart", "Charger", "Polara", "Magnum", "LeBaron", "Dakota", "Ram"],
-    "Plymouth": ["Valiant", "Belvedere", "Fury", "Satellite", "Barracuda", "Duster"],
-    "Willys": ["Jeep", "Pickup", "Rural", "Interlagos", "Itamaraty"],
-    "Toyota": ["Corolla", "Hilux", "Bandeirante", "Supra", "Celica"],
-    "Mercedes-Benz": ["280S", "450SEL", "500SEC", "190E", "300E", "SL500"],
-    "Citroën": ["2CV", "Dyane", "Ami", "GS", "CX", "BX", "XM", "ZX"],
-    "Peugeot": ["504", "505", "205", "306", "406"],
-    "Renault": ["Dauphine", "Gordini", "12", "19", "21", "Laguna"],
-    "Alfa Romeo": ["Giulia", "Spider", "164", "156"],
-    "BMW": ["2002", "320i", "325i", "528i", "635CSi", "M3 E30", "M5 E28", "Z1", "840Ci", "850i"],
-    "Jaguar": ["XJ6", "XJS", "E-Type", "Mark 2"],
-    "Mitsubishi": ["Eclipse", "3000GT", "Pajero", "L200"],
-    "Nissan": ["300ZX", "Silvia", "Skyline", "Pathfinder"],
-    "Subaru": ["Impreza", "Legacy", "Forester", "SVX"],
-    "Volvo": ["240", "740", "760", "850", "960", "P1800"],
+    "Chevrolet": ["Bel Air","Impala","Opala","Chevette","Monza","Kadett","Vectra","Omega","Astra","Corsa","Ipanema","Suprema","Camaro","Corvette","Marajó","Chevy 500","A10","A14","A20","C10","C14","C15","C20","D10","D14","D20","Bonanza","Veraneio","S10","Blazer","Silverado","Caminhão 40","Caminhão 6100","Caminhão 6500","Caminhão 7100"],
+    "Ford": ["Galaxie","Landau","Maverick","Corcel","Corcel II","Del Rey","Belina","Belina II","Escort","Versailles","Fiesta","Ka","Mondeo","Mustang","Galaxy","Explorer","Pampa","F-75","F-100","F-1000","F-250","Ranger","F-350","F-4000","F-7000","F-11000","F-14000","Cargo 815","Cargo 1317","Cargo 1617","Cargo 2428","Transcontinental"],
+    "Volkswagen": ["Fusca","Karmann Ghia","Brasília","Variant","Variant II","Passat","Gol","Voyage","Parati","Fox","Santana","Quantum","Apollo","Logus","Pointer","Golf","Polo","Jetta","Corrado","Kombi","Saveiro","VW 7.90","VW 8.120","VW 9.150","VW 11.130","VW 13.180","VW 15.180","VW 16.220","VW 18.310","VW 35.300"],
+    "Fiat": ["147","Spazio","Panorama","Prêmio","Elba","Uno","Tempra","Tipo","Marea","Brava","Bravo","Palio","Siena","Palio Weekend","Punto","Fiat Coupé","Fiorino","Ducato"],
+    "Mercedes-Benz": ["190","C180","C220","C280","C36 AMG","E230","E280","E320","S320","S420","S500","SLK 230","CLK 230","CLK 320","ML 320","A160","A190","Sprinter","L-312","L-608","L-1113","L-1313","L-1513","L-1519","L-1620","L-1720","LS-1935","LS-2635","Atego 1418","Actros 1835"],
+    "Toyota": ["Corona","Corolla","Camry","Celica","MR2","RAV4","Bandeirante","Land Cruiser","Hilux","SW4","Prado"],
+    "Honda": ["Civic","Accord","Prelude","CR-V","City","Legend","NSX"],
+    "Nissan": ["Sentra","Pathfinder","Frontier","Pickup D21","Maxima","200SX","Bluebird"],
+    "Mitsubishi": ["Lancer","Galant","Eclipse","Pajero Full","Pajero Sport","Pajero TR4","L200","Space Wagon","3000GT"],
+    "Subaru": ["Legacy","Impreza","Forester","Outback"],
+    "Mazda": ["323","626","MX-5 Miata","RX-7"],
+    "Renault": ["R-4","R-8","R-10","R-12","R-18","R-19","Clio","Mégane","Laguna","Scenic","Trafic","Master"],
+    "Peugeot": ["404","504","106","205","206","306","405","406","605","Partner"],
+    "Citroën": ["AX","BX","ZX","Saxo","Xsara","Xantia","Berlingo","Jumper"],
+    "BMW": ["318i","320i","323i","328i","M3","520i","528i","540i","730i","740i","750iL","Z3 1.8","Z3 2.8"],
+    "Hyundai": ["Accent","Elantra","Sonata","Galloper","Tucson"],
+    "Kia": ["Sephia","Sportage","Carnival"],
+    "Daewoo": ["Lanos","Nubira","Leganza","Espero","Tico"],
+    "Volvo": ["240","440","460","850","S40","S70","S80","V40","V70","C70","XC70","N10","N12","NL10","NL12","FM7","FM10","FM12","FH12","FH16"],
+    "Saab": ["900","9000","9-3","9-5"],
+    "Scania": ["L-111","L-112","L-141","R-112","R-113","R-124","R-164","T-113","T-124"],
+    "Land Rover": ["Series II/III","Defender","Discovery","Freelander","Range Rover"],
+    "Jaguar": ["XJ6","XJ8","XJR","XK8","XJS"],
+    "Audi": ["80","90","100","200","A3","A4","A4 Avant","A6","A6 Avant","A8","S4","S6","Cabriolet","Coupé"],
+    "Porsche": ["911 Carrera","911 Turbo","Boxster","928","944","968"],
+    "Alfa Romeo": ["145","146","155","156","164","GTV","Spider"],
+    "Gurgel": ["X-12","X-15","Tocantins","Carajás","BR-800","E-400"],
+    "Puma": ["GTB","GTC","GTS","AMV"]
 }
 
-# (funções auxiliares permanecem idênticas)
-
-def extrair_precos_da_listagem(soup):
-    scripts = soup.find_all('script')
-    for script in scripts:
-        if script.string and '__INITIAL_STATE__' in script.string:
-            try:
-                json_str = script.string.split('__INITIAL_STATE__=')[1].split(';\n')[0]
-                data = json.loads(json_str)
-                ads = data.get('listingProps', {}).get('adList', [])
-                if not ads: ads = data.get('ads', [])
-                if not ads: ads = data.get('results', [])
-                precos = {}
-                for ad in ads:
-                    url = ad.get('url') or ad.get('permalink')
-                    price = ad.get('price') or ad.get('priceValue')
-                    if url and price:
-                        precos[url] = float(price)
-                return precos
-            except: pass
-    return {}
-
-def extrair_preco_card(parent, texto):
-    for classe in ['price', 'preco', 'ad__price', 'actual-price', 'olx-text--heading-2', 'm7nrfa-', 'sc-ifAKCX']:
-        elem = parent.find(['span', 'div', 'h2', 'h3'], class_=re.compile(classe, re.IGNORECASE))
-        if elem:
-            match = re.search(r'R\$\s*([\d.]+)', elem.get_text(strip=True))
-            if match:
-                try:
-                    val = float(match.group(1).replace('.', ''))
-                    if 1000 <= val <= 5000000: return val
-                except: pass
-    match = re.search(r'R\$\s*([\d.]+)', texto)
-    if match:
-        try:
-            val = float(match.group(1).replace('.', ''))
-            if 1000 <= val <= 5000000: return val
-        except: pass
-    for attr in ['aria-label', 'data-price', 'content']:
-        val = parent.get(attr)
-        if val:
-            match = re.search(r'(\d{1,3}(?:\.\d{3})+)', val)
-            if match:
-                try:
-                    val = float(match.group(1).replace('.', ''))
-                    if 1000 <= val <= 5000000: return val
-                except: pass
-    return 0
-
-def extrair_preco_pagina(url_anuncio):
+def extrair_dados_json(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    script = soup.find('script', id='__NEXT_DATA__', type='application/json')
+    if not script: return []
     try:
-        resp = scraper.get(url_anuncio, timeout=6)
-        if resp.status_code == 200:
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            meta = soup.find('meta', itemprop='price') or soup.find('meta', property='product:price:amount')
-            if meta and meta.get('content'):
-                try: return float(meta['content'])
-                except: pass
-            for classe in ['price', 'preco', 'ad__price', 'actual-price', 'olx-text--heading-2']:
-                elem = soup.find(['span', 'div', 'h2', 'h3'], class_=re.compile(classe, re.IGNORECASE))
-                if elem:
-                    match = re.search(r'R\$\s*([\d.]+)', elem.get_text(strip=True))
-                    if match:
-                        try:
-                            val = float(match.group(1).replace('.', ''))
-                            if 1000 <= val <= 5000000: return val
-                        except: pass
-            textos = soup.find_all(string=re.compile(r'R\$\s*[\d.]+'))
-            precos = []
-            for t in textos:
-                texto = t.strip()
-                if re.search(r'\d+x\s*R\$', texto): continue
-                match = re.search(r'R\$\s*([\d.]+)', texto)
-                if match:
-                    try:
-                        val = float(match.group(1).replace('.', ''))
-                        if 1000 <= val <= 5000000: precos.append(val)
-                    except: pass
-            if precos: return max(precos)
-    except: pass
-    return 0
+        data = json.loads(script.string)
+        ads = data.get('props', {}).get('pageProps', {}).get('ads', [])
+        return ads
+    except:
+        return []
 
 def buscar_olx(marca, modelo, preco_max=999999, ano_min=1940, ano_max=2000, km_min=0, km_max=999999, uf='', pagina=1):
     carros = []
-    query_parts = []
-    if marca: query_parts.append(marca)
-    if modelo: query_parts.append(modelo)
-    query = ' '.join(query_parts).strip()
-    if not query: return []
+    
+    if marca and modelo:
+        query = f'{marca} {modelo}'
+    elif marca:
+        modelos = MARCAS_CLASSICAS.get(marca, [])
+        if modelos:
+            query = ' '.join(modelos[:8])
+        else:
+            query = marca
+    else:
+        return []
     
     url = f'https://www.olx.com.br/autos-e-pecas/carros-vans-e-utilitarios?q={urllib.parse.quote(query)}&o={pagina}'
     if uf:
         url += f'&sf=1&state={uf}'
     
-    # Se um modelo específico foi escolhido, usamos só ele. Senão, usamos TODOS os modelos clássicos da marca.
-    if modelo:
-        modelos_filtro = [modelo]
-    else:
-        # Se a marca está no dicionário, aplica filtro pelos modelos; senão, sem filtro (caso "Todas" marcas)
-        modelos_filtro = MARCAS_CLASSICAS.get(marca, [])
-    
     print(f'🔍 Buscando: {url}')
     try:
-        resp = scraper.get(url, timeout=20)
+        resp = scraper.get(url, timeout=40)
         if resp.status_code == 200:
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            precos_json = extrair_precos_da_listagem(soup)
-            print(f'   Preços JSON: {len(precos_json)}')
+            ads = extrair_dados_json(resp.text)
+            print(f'   Anúncios no JSON: {len(ads)}')
             
-            links = soup.find_all('a', href=re.compile(r'-\d{9,}'))
-            urls_vistas = set()
-            for link in links:
-                href = link.get('href', '')
-                if href.startswith('/'): href = 'https://www.olx.com.br' + href
-                if href not in urls_vistas and 'olx.com.br' in href:
-                    urls_vistas.add(href)
-                    parent = link.find_parent(['li', 'div', 'section'])
-                    texto = parent.get_text(' ', strip=True) if parent else link.get_text(strip=True)
-                    titulo = link.get_text(strip=True) or texto[:150]
-                    
-                    # Filtro por modelos (se houver lista)
-                    if modelos_filtro:
-                        padrao_modelos = '|'.join(re.escape(m) for m in modelos_filtro)
-                        if not re.search(padrao_modelos, titulo, re.IGNORECASE):
-                            continue
-                    
-                    ano = 0
-                    ano_match = re.search(r'\b(19[4-9][0-9]|20[0-2][0-9])\b', titulo)
-                    if not ano_match:
-                        ano_match = re.search(r'\b(19[4-9][0-9]|20[0-2][0-9])\b', texto)
-                    if ano_match:
-                        ano = int(ano_match.group(1))
-                    
-                    if ano > 2000:
-                        continue
-                    if 0 < ano < ano_min or (ano_max < 2000 and ano > ano_max):
-                        continue
-                    
-                    # Se ano não detectado e não estamos filtrando por modelo, rejeitar fortes indícios de moderno
-                    if ano == 0 and not modelos_filtro:
-                        termos_modernos = ['flex', '1.0', '1.4', '1.5', '1.6', '1.8', '2.0', '16v', 'vvt', 'multimídia', 'multimidia', 'digital', 'turbo', 'câmbio automático', 'automático', 'aut.', 'start-stop']
-                        if any(termo in titulo.lower() for termo in termos_modernos):
-                            continue
-                    
-                    preco = precos_json.get(href, 0)
-                    if preco == 0:
-                        preco = extrair_preco_card(parent, texto)
-                    
-                    km = 0
-                    km_match = re.search(r'(\d{1,3}(?:\.\d{3})*)\s*km', texto, re.IGNORECASE)
-                    if km_match: km = int(km_match.group(1).replace('.', ''))
-                    
-                    if km > 0:
-                        if km < km_min: continue
-                        if km_max < 999999 and km > km_max: continue
-                    
-                    cambio = ''
-                    if re.search(r'aut[oá]m[áa]tic[oa]', texto, re.IGNORECASE): cambio = 'Automático'
-                    elif re.search(r'manual', texto, re.IGNORECASE): cambio = 'Manual'
-                    
-                    combustivel = ''
-                    for tipo in ['Flex','Gasolina','Diesel','Elétrico','Híbrido']:
-                        if re.search(tipo.lower(), texto, re.IGNORECASE): combustivel = tipo; break
-                    
-                    cidade = estado = ''
-                    loc_match = re.search(r'https?://([a-z]{2})\.olx\.com\.br/([^/]+)/', href)
-                    if loc_match:
-                        estado = loc_match.group(1).upper()
-                        cidade = loc_match.group(2).replace('-', ' ').title()
-                    
-                    carros.append({
-                        'titulo': titulo[:150], 'preco': preco, 'ano': ano, 'km': km,
-                        'cambio': cambio, 'combustivel': combustivel,
-                        'cidade': cidade, 'estado': estado, 'url': href
-                    })
+            for ad in ads:
+                titulo = ad.get('title') or ad.get('subject', '')
+                if not titulo or len(titulo) < 5:
+                    continue
+                
+                # CORREÇÃO DO PREÇO
+                preco_str = ad.get('priceValue', '0')
+                preco_clean = preco_str.replace('R$', '').replace('.', '').replace(',', '.').strip()
+                try:
+                    preco = float(preco_clean)
+                except:
+                    preco = 0
+                if preco <= 0:
+                    continue
+                
+                # Ano
+                ano = 0
+                props = ad.get('properties', [])
+                for p in props:
+                    if p.get('name') == 'regdate':
+                        ano_val = p.get('value', '0')
+                        try:
+                            ano = int(re.search(r'\d{4}', str(ano_val)).group())
+                        except:
+                            pass
+                        break
+                
+                km = 0
+                for p in props:
+                    if p.get('name') == 'mileage':
+                        km = int(re.sub(r'\D', '', p.get('value', '0')))
+                        break
+                cambio = ''
+                for p in props:
+                    if p.get('name') == 'gearbox':
+                        cambio = p.get('value', '')
+                        break
+                combustivel = ''
+                for p in props:
+                    if p.get('name') == 'fuel':
+                        combustivel = p.get('value', '')
+                        break
+                
+                cidade = ''
+                estado = ''
+                loc = ad.get('locationDetails', {})
+                if loc:
+                    cidade = loc.get('municipality', '')
+                    estado = loc.get('uf', '')
+                
+                url_anuncio = ad.get('url') or ad.get('friendlyUrl', '')
+                images = ad.get('images', [])
+                foto = images[0].get('original') if images else ''
+                
+                if ano > 2000: continue
+                if 0 < ano < ano_min or (ano_max < 2000 and ano > ano_max): continue
+                if km and (km < km_min or (km_max < 999999 and km > km_max)): continue
+                if uf and estado.upper() != uf.upper(): continue
+                
+                carros.append({
+                    'titulo': titulo[:150], 'preco': preco, 'ano': ano, 'km': km,
+                    'cambio': cambio, 'combustivel': combustivel,
+                    'cidade': cidade, 'estado': estado, 'url': url_anuncio,
+                    'foto': foto
+                })
             
-            if uf:
-                carros = [c for c in carros if c['estado'].upper() == uf]
-            
-            sem_preco = [c for c in carros if c['preco'] == 0]
-            if sem_preco:
-                print(f'📋 {len(carros)} listados, {len(sem_preco)} sem preço. Extraindo páginas individuais...')
-                for i, carro in enumerate(sem_preco):
-                    print(f'   {i+1}/{len(sem_preco)}: {carro["titulo"][:60]}...')
-                    carro['preco'] = extrair_preco_pagina(carro['url'])
+            if len(carros) < 30 and not modelo and pagina == 1:
+                print(f'   Poucos resultados ({len(carros)}), buscando página 2...')
+                carros_pag2 = buscar_olx(marca, modelo, preco_max, ano_min, ano_max, km_min, km_max, uf, pagina=2)
+                carros.extend(carros_pag2)
             
             carros = [c for c in carros if not (c['preco'] > 0 and c['preco'] > preco_max)]
             carros.sort(key=lambda x: (0 if x['preco'] > 0 else 1, x['preco']))
@@ -245,7 +174,6 @@ def buscar_fipe(marca, modelo, ano=1980):
         return float(dados['Valor'].replace('R$', '').replace('.', '').replace(',', '.'))
     except: return None
 
-# (HTML permanece o mesmo)
 HTML = """
 <!DOCTYPE html>
 <html>
@@ -263,7 +191,10 @@ HTML = """
         button { width: 100%; padding: 12px; background: #e94560; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
         button:hover { background: #c23152; }
         .fipe-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin: 15px 0; border-radius: 5px; }
-        .result { border: 1px solid #e0e0e0; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fafafa; }
+        .result { border: 1px solid #e0e0e0; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fafafa; display: flex; align-items: center; gap: 15px; }
+        .result:hover { border-color: #e94560; background: #fff5f5; }
+        .result-img { width: 120px; height: 90px; object-fit: cover; border-radius: 6px; background: #eee; flex-shrink: 0; }
+        .result-info { flex: 1; }
         .preco { color: #2e7d32; font-size: 1.3em; font-weight: bold; }
         .abaixo-fipe { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; }
         .detalhes { color: #888; font-size: 0.9em; }
@@ -379,22 +310,29 @@ HTML = """
         <p><b>{{ carros|length }} clássicos encontrados</b></p>
         {% for c in carros %}
         <div class="result">
-            <a href="{{ c.url }}" target="_blank"><b>{{ c.titulo[:120] }}</b></a><span class="classic-badge">CLÁSSICO</span>
-            <br>
-            <span class="detalhes">
-                📅 {{ c.ano if c.ano else 'N/D' }} • 🏁 {{ "{:,.0f}".format(c.km).replace(",", "X").replace(".", ",").replace("X", ".") if c.km else 'N/D' }} km
-                {% if c.cambio %} • ⚙️ {{ c.cambio }}{% endif %}
-                {% if c.combustivel %} • ⛽ {{ c.combustivel }}{% endif %}
-                {% if c.cidade %} • 📍 {{ c.cidade }}/{{ c.estado }}{% endif %}
-            </span>
-            <span style="float:right; text-align:right;">
+            {% if c.foto %}
+            <img src="{{ c.foto }}" class="result-img" alt="Foto" onerror="this.style.display='none'">
+            {% else %}
+            <div class="result-img" style="background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em;">🚗</div>
+            {% endif %}
+            <div class="result-info">
+                <a href="{{ c.url }}" target="_blank"><b>{{ c.titulo[:120] }}</b></a><span class="classic-badge">CLÁSSICO</span>
+                <br>
+                <span class="detalhes">
+                    📅 {{ c.ano if c.ano else 'N/D' }} • 🏁 {{ "{:,.0f}".format(c.km).replace(",", "X").replace(".", ",").replace("X", ".") if c.km else 'N/D' }} km
+                    {% if c.cambio %} • ⚙️ {{ c.cambio }}{% endif %}
+                    {% if c.combustivel %} • ⛽ {{ c.combustivel }}{% endif %}
+                    {% if c.cidade %} • 📍 {{ c.cidade }}/{{ c.estado }}{% endif %}
+                </span>
+            </div>
+            <div style="text-align:right; margin-left:auto;">
                 {% if c.preco > 0 %}
                 <span class="preco">R$ {{ "{:,.2f}".format(c.preco).replace(",", "X").replace(".", ",").replace("X", ".") }}</span>
                 {% if fipe and c.preco < fipe %}<span class="abaixo-fipe">⬇️ FIPE</span>{% endif %}
                 {% else %}
-                <span class="no-price">Preço não extraído</span>
+                <span class="no-price">Preço sob consulta</span>
                 {% endif %}
-            </span>
+            </div>
         </div>
         {% endfor %}
         {% endif %}
