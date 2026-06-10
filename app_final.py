@@ -52,6 +52,8 @@ def buscar_olx(marca, modelo, preco_max=999999, ano_min=1940, ano_max=2000, uf='
                         for ad in extrair_dados_json(resp.text):
                             titulo = ad.get('title') or ad.get('subject', '')
                             if not titulo or len(titulo) < 5: continue
+                            if marca and marca.lower() not in titulo.lower():
+                                continue
                             preco_str = ad.get('priceValue', '0')
                             preco_clean = preco_str.replace('R$','').replace('.','').replace(',','.').strip()
                             try: preco = float(preco_clean)
