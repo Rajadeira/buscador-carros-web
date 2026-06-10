@@ -159,98 +159,163 @@ def buscar_olx(marca, modelo, preco_max=999999, ano_min=1940, ano_max=2000, uf='
 
 HTML = """
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rajadeira Classicos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial; max-width: 950px; margin: 20px auto; padding: 15px; background: #f0f2f5; }
-        .header { background: #e94560; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center; }
-        .card { background: white; border-radius: 0 0 10px 10px; padding: 20px; }
-        select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; margin: 3px 0; font-size: 13px; }
-        button { background: #e94560; color: white; padding: 12px; border: none; border-radius: 5px; width: 100%; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        .result { border: 1px solid #ddd; padding: 12px; margin: 10px 0; border-radius: 8px; display: flex; gap: 15px; align-items: center; }
-        .result-img { width: 120px; height: 90px; object-fit: cover; border-radius: 6px; background: #eee; }
-        .preco { color: green; font-size: 1.3em; font-weight: bold; }
-        .detalhes { color: #888; font-size: 0.85em; }
-        a { color: #1565c0; text-decoration: none; }
-        .classic-badge { background: #8B4513; color: gold; padding: 2px 8px; border-radius: 4px; font-size: 0.7em; }
-        .filtro-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .filtro-item { flex: 1; min-width: 100px; }
-        label { font-weight: bold; font-size: 0.8em; color: #555; }
-        .spinner { border: 4px solid #eee; border-top: 4px solid #e94560; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: radial-gradient(circle at 20% 50%, #1a1a2e 0%, #0a0a0a 50%),
+                        radial-gradient(circle at 80% 20%, #16213e 0%, #0a0a0a 50%);
+            z-index: -1; }
+        
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        
+        .header { text-align: center; padding: 40px 20px; position: relative; }
+        .header h1 { font-size: 3em; font-weight: 900; background: linear-gradient(135deg, #e94560, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header .subtitle { color: #888; font-size: 1.1em; margin-top: 5px; }
+        .header .year-badge { display: inline-block; background: #e94560; color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; margin-top: 10px; }
+        
+        .search-card { background: rgba(20,20,40,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
+        
+        .filtro-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .filtro-item { flex: 1; min-width: 110px; }
+        .filtro-item label { display: block; font-size: 0.75em; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .filtro-item select { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.9em; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+        .filtro-item select:hover { border-color: #e94560; }
+        .filtro-item select:focus { outline: none; border-color: #e94560; box-shadow: 0 0 0 2px rgba(233,69,96,0.3); }
+        .filtro-item select option { background: #1a1a2e; color: #fff; }
+        
+        .btn-buscar { width: 100%; padding: 14px; background: linear-gradient(135deg, #e94560, #c23152); color: #fff; border: none; border-radius: 10px; font-size: 1.1em; font-weight: 700; cursor: pointer; margin-top: 15px; letter-spacing: 1px; transition: all 0.3s; text-transform: uppercase; }
+        .btn-buscar:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233,69,96,0.4); }
+        
+        .resultado-card { background: rgba(20,20,40,0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; gap: 15px; align-items: center; transition: all 0.3s; cursor: pointer; }
+        .resultado-card:hover { border-color: #e94560; background: rgba(233,69,96,0.05); transform: translateX(5px); }
+        .car-img { width: 140px; height: 100px; object-fit: cover; border-radius: 8px; background: #1a1a2e; flex-shrink: 0; }
+        .car-info { flex: 1; }
+        .car-info a { color: #fff; text-decoration: none; font-weight: 600; font-size: 1.05em; }
+        .car-info a:hover { color: #e94560; }
+        .car-detalhes { color: #888; font-size: 0.85em; margin-top: 5px; }
+        .car-detalhes span { display: inline-block; margin-right: 10px; }
+        .badge-classic { display: inline-block; background: linear-gradient(135deg, #8B4513, #D2691E); color: #FFD700; padding: 3px 8px; border-radius: 4px; font-size: 0.7em; font-weight: 700; margin-left: 5px; }
+        .car-preco { text-align: right; font-size: 1.4em; font-weight: 700; color: #4ecca3; white-space: nowrap; }
+        
+        .stats-bar { display: flex; gap: 15px; margin: 15px 0; }
+        .stat-box { flex: 1; background: rgba(233,69,96,0.1); border: 1px solid rgba(233,69,96,0.2); border-radius: 10px; padding: 12px; text-align: center; }
+        .stat-box .stat-num { font-size: 1.5em; font-weight: 700; color: #e94560; }
+        .stat-box .stat-label { font-size: 0.75em; color: #888; }
+        
+        .loading { text-align: center; padding: 40px; }
+        .spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #e94560; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .sem-resultados { text-align: center; padding: 30px; color: #888; }
+        
+        .no-results { text-align: center; padding: 40px; color: #888; }
+        .no-results .icon { font-size: 3em; margin-bottom: 10px; }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .resultado-card { flex-direction: column; }
+            .car-img { width: 100%; height: 180px; }
+            .car-preco { text-align: left; margin-top: 10px; }
+        }
     </style>
 </head>
 <body>
-    <div class="header"><h1>Rajadeira Classicos</h1><p>31 marcas • 1940 a 2000</p></div>
-    <div class="card">
-        <form method="GET" action="/buscar" onsubmit="document.getElementById('loading').style.display='block'; document.getElementById('resultados').style.display='none';">
-            <div class="filtro-row">
-                <div class="filtro-item">
-                    <label>Marca</label>
-                    <select name="marca" id="marca" onchange="atualizarModelos()">
-                        <option value="">Todas</option>
-                        {% for m in marcas %}<option value="{{ m }}" {% if marca_sel==m %}selected{% endif %}>{{ m }}</option>{% endfor %}
-                    </select>
-                </div>
-                <div class="filtro-item">
-                    <label>Modelo</label>
-                    <select name="modelo" id="modelo"><option value="">Todos</option></select>
-                </div>
-            </div>
-            <div class="filtro-row">
-                <div class="filtro-item"><label>Preço máx</label><select name="preco_max">{% for p in precos %}<option value="{{ p }}" {% if preco_sel==p|string %}selected{% endif %}>R$ {{ "{:,.0f}".format(p) }}</option>{% endfor %}</select></div>
-                <div class="filtro-item"><label>Estado</label><select name="uf">{% for s,n in estados %}<option value="{{ s }}" {% if uf_sel==s %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
-                <div class="filtro-item"><label>KM máx</label><select name="km_max"><option value="">Todos</option>{% for k in kms %}<option value="{{ k }}" {% if km_sel==k|string %}selected{% endif %}>{{ "{:,.0f}".format(k) }} km</option>{% endfor %}</select></div>
-            </div>
-            <div class="filtro-row">
-                <div class="filtro-item"><label>Ano inicial</label><select name="ano_min">{% for a in anos %}<option value="{{ a }}" {% if ano_min_sel==a|string %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></div>
-                <div class="filtro-item"><label>Ano final</label><select name="ano_max">{% for a in anos %}<option value="{{ a }}" {% if ano_max_sel==a|string %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></div>
-            </div>
-            <div class="filtro-row">
-                <div class="filtro-item"><label>Câmbio</label><select name="cambio"><option value="">Todos</option><option value="Automático" {% if cambio_sel=='Automático' %}selected{% endif %}>Automático</option><option value="Manual" {% if cambio_sel=='Manual' %}selected{% endif %}>Manual</option></select></div>
-                <div class="filtro-item"><label>Combustível</label><select name="combustivel"><option value="">Todos</option>{% for c in ['Gasolina','Flex','Diesel','Híbrido','Elétrico'] %}<option value="{{ c }}" {% if comb_sel==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
-                <div class="filtro-item"><label>Cor</label><select name="cor"><option value="">Todas</option>{% for c in cores %}<option value="{{ c }}" {% if cor_sel==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
-            </div>
-            <div class="filtro-row">
-                <div class="filtro-item"><label>Tipo</label><select name="tipo"><option value="">Todos</option>{% for t in tipos %}<option value="{{ t }}" {% if tipo_sel==t %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
-                <div class="filtro-item"><label>Portas</label><select name="portas"><option value="">Todas</option>{% for p in portas_opcoes %}<option value="{{ p }}" {% if portas_sel==p|string %}selected{% endif %}>{{ p }} portas</option>{% endfor %}</select></div>
-                <div class="filtro-item"><label>Ordenar</label><select name="ordem"><option value="preco_asc" {% if ordem_sel=='preco_asc' %}selected{% endif %}>Menor Preço</option><option value="preco_desc" {% if ordem_sel=='preco_desc' %}selected{% endif %}>Maior Preço</option><option value="ano_desc" {% if ordem_sel=='ano_desc' %}selected{% endif %}>Mais Novo</option><option value="ano_asc" {% if ordem_sel=='ano_asc' %}selected{% endif %}>Mais Antigo</option><option value="km_asc" {% if ordem_sel=='km_asc' %}selected{% endif %}>Menor KM</option></select></div>
-            </div>
-            <button type="submit">BUSCAR CLASSICOS</button>
-        </form>
-        <div id="loading" style="display:none;"><div class="spinner"></div><p>Pesquisando...</p></div>
-        <div id="resultados">
-        {% if carros is defined and carros|length > 0 %}
-        <p><b>{{ carros|length }} classicos encontrados</b></p>
-        {% for c in carros %}
-        <div class="result">
-            {% if c.foto %}<img src="{{ c.foto }}" class="result-img" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous">{% else %}<div class="result-img" style="display:flex; align-items:center; justify-content:center; font-size:2em;">🚗</div>{% endif %}
-            <div style="flex:1;">
-                <a href="{{ c.url }}" target="_blank"><b>{{ c.titulo[:120] }}</b></a><span class="classic-badge">CLASSICO</span>
-                <br><span class="detalhes">
-                    {{ c.ano if c.ano else 'N/D' }} | {{ c.km if c.km else 'N/D' }} km
-                    {% if c.cambio %} | {{ c.cambio }}{% endif %}
-                    {% if c.combustivel %} | {{ c.combustivel }}{% endif %}
-                    {% if c.cor %} | {{ c.cor }}{% endif %}
-                    {% if c.tipo %} | {{ c.tipo }}{% endif %}
-                    {% if c.portas %} | {{ c.portas }}p{% endif %}
-                    {% if c.cidade %} | {{ c.cidade }}/{{ c.estado }}{% endif %}
-                </span>
-            </div>
-            <div><span class="preco">R$ {{ "{:,.2f}".format(c.preco) }}</span></div>
+    <div class="bg-pattern"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 RAJADEIRA CLASSICOS</h1>
+            <p class="subtitle">O maior buscador de carros antigos do Brasil</p>
+            <span class="year-badge">1940 — 2000</span>
         </div>
-        {% endfor %}
-        {% elif carros is defined and carros|length == 0 %}
-        <div class="sem-resultados">
-            <p>😕 Nenhum classico encontrado com esses filtros.</p>
-            <p>Tente ampliar a busca (remover filtros ou aumentar limites).</p>
+        
+        <div class="search-card">
+            <form method="GET" action="/buscar" onsubmit="document.getElementById('loading-area').style.display='block'; document.getElementById('results-area').style.display='none';">
+                <div class="filtro-row">
+                    <div class="filtro-item">
+                        <label>🏭 Marca</label>
+                        <select name="marca" id="marca" onchange="atualizarModelos()">
+                            <option value="">Todas</option>
+                            {% for m in marcas %}<option value="{{ m }}" {% if marca_sel==m %}selected{% endif %}>{{ m }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>🚙 Modelo</label>
+                        <select name="modelo" id="modelo"><option value="">Todos</option></select>
+                    </div>
+                </div>
+                <div class="filtro-row">
+                    <div class="filtro-item"><label>💰 Preço máx</label><select name="preco_max">{% for p in precos %}<option value="{{ p }}" {% if preco_sel==p|string %}selected{% endif %}>R$ {{ "{:,.0f}".format(p) }}</option>{% endfor %}</select></div>
+                    <div class="filtro-item"><label>📍 Estado</label><select name="uf">{% for s,n in estados %}<option value="{{ s }}" {% if uf_sel==s %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
+                    <div class="filtro-item"><label>🏁 KM máx</label><select name="km_max"><option value="">Todos</option>{% for k in kms %}<option value="{{ k }}" {% if km_sel==k|string %}selected{% endif %}>{{ "{:,.0f}".format(k) }} km</option>{% endfor %}</select></div>
+                </div>
+                <div class="filtro-row">
+                    <div class="filtro-item"><label>📅 Ano inicial</label><select name="ano_min">{% for a in anos %}<option value="{{ a }}" {% if ano_min_sel==a|string %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></div>
+                    <div class="filtro-item"><label>📅 Ano final</label><select name="ano_max">{% for a in anos %}<option value="{{ a }}" {% if ano_max_sel==a|string %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></div>
+                </div>
+                <div class="filtro-row">
+                    <div class="filtro-item"><label>⚙️ Câmbio</label><select name="cambio"><option value="">Todos</option><option value="Automático" {% if cambio_sel=='Automático' %}selected{% endif %}>Automático</option><option value="Manual" {% if cambio_sel=='Manual' %}selected{% endif %}>Manual</option></select></div>
+                    <div class="filtro-item"><label>⛽ Combustível</label><select name="combustivel"><option value="">Todos</option>{% for c in ['Gasolina','Flex','Diesel','Híbrido','Elétrico'] %}<option value="{{ c }}" {% if comb_sel==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+                    <div class="filtro-item"><label>🎨 Cor</label><select name="cor"><option value="">Todas</option>{% for c in cores %}<option value="{{ c }}" {% if cor_sel==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+                </div>
+                <div class="filtro-row">
+                    <div class="filtro-item"><label>🚗 Tipo</label><select name="tipo"><option value="">Todos</option>{% for t in tipos %}<option value="{{ t }}" {% if tipo_sel==t %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
+                    <div class="filtro-item"><label>🚪 Portas</label><select name="portas"><option value="">Todas</option>{% for p in portas_opcoes %}<option value="{{ p }}" {% if portas_sel==p|string %}selected{% endif %}>{{ p }} portas</option>{% endfor %}</select></div>
+                    <div class="filtro-item"><label>📊 Ordenar</label><select name="ordem"><option value="preco_asc" {% if ordem_sel=='preco_asc' %}selected{% endif %}>Menor Preço</option><option value="preco_desc" {% if ordem_sel=='preco_desc' %}selected{% endif %}>Maior Preço</option><option value="ano_desc" {% if ordem_sel=='ano_desc' %}selected{% endif %}>Mais Novo</option><option value="ano_asc" {% if ordem_sel=='ano_asc' %}selected{% endif %}>Mais Antigo</option><option value="km_asc" {% if ordem_sel=='km_asc' %}selected{% endif %}>Menor KM</option></select></div>
+                </div>
+                <button type="submit" class="btn-buscar">🔍 BUSCAR CARROS CLÁSSICOS</button>
+            </form>
         </div>
-        {% endif %}
+        
+        <div id="loading-area" class="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p style="color:#888;">Pesquisando nos classificados...</p>
+        </div>
+        
+        <div id="results-area">
+            {% if carros is defined and carros|length > 0 %}
+            <div class="stats-bar">
+                <div class="stat-box"><div class="stat-num">{{ carros|length }}</div><div class="stat-label">Clássicos Encontrados</div></div>
+                <div class="stat-box"><div class="stat-num">R$ {{ "{:,.0f}".format(carros[0].preco) }}</div><div class="stat-label">Menor Preço</div></div>
+                <div class="stat-box"><div class="stat-num">R$ {{ "{:,.0f}".format(carros[-1].preco) }}</div><div class="stat-label">Maior Preço</div></div>
+            </div>
+            
+            {% for c in carros %}
+            <div class="resultado-card" onclick="window.open('{{ c.url }}', '_blank')">
+                {% if c.foto %}
+                <img src="{{ c.foto }}" class="car-img" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.style.display='none'">
+                {% endif %}
+                <div class="car-info">
+                    <a href="{{ c.url }}" target="_blank">{{ c.titulo[:120] }}</a><span class="badge-classic">CLÁSSICO</span>
+                    <div class="car-detalhes">
+                        <span>📅 {{ c.ano if c.ano else 'N/D' }}</span>
+                        <span>🏁 {{ "{:,.0f}".format(c.km) if c.km else 'N/D' }} km</span>
+                        {% if c.cambio %}<span>⚙️ {{ c.cambio }}</span>{% endif %}
+                        {% if c.combustivel %}<span>⛽ {{ c.combustivel }}</span>{% endif %}
+                        {% if c.cor %}<span>🎨 {{ c.cor }}</span>{% endif %}
+                        {% if c.tipo %}<span>🚗 {{ c.tipo }}</span>{% endif %}
+                        {% if c.cidade %}<span>📍 {{ c.cidade }}/{{ c.estado }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="car-preco">R$ {{ "{:,.0f}".format(c.preco) }}</div>
+            </div>
+            {% endfor %}
+            
+            {% elif carros is defined and carros|length == 0 %}
+            <div class="no-results">
+                <div class="icon">🔍</div>
+                <h3>Nenhum clássico encontrado</h3>
+                <p>Tente ampliar os filtros ou buscar por outra marca/modelo.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
+    
     <script>
         const MODELOS = {{ modelos_json | safe }};
         function atualizarModelos(){const m=document.getElementById('marca').value;const s=document.getElementById('modelo');s.innerHTML='<option value="">Todos</option>';if(m&&MODELOS[m]){MODELOS[m].forEach(function(x){const o=document.createElement('option');o.value=x;o.textContent=x;s.appendChild(o)})}}
@@ -303,7 +368,7 @@ def buscar():
 
 if __name__ == '__main__':
     print('='*50)
-    print('RAJADEIRA CLASSICOS - FILTROS MANTIDOS')
+    print('RAJADEIRA CLASSICOS - DARK MODE PREMIUM')
     print('http://localhost:5000')
     print('='*50)
     app.run(debug=False, host='0.0.0.0', port=5000)
